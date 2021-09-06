@@ -205,15 +205,18 @@ def define(n, val):
 #------------------------Tokenizacion-Parser-------------------------------
 
 tokenizer=MWETokenizer()
-tokenizer.add_mwe(blockedp())
 def archivo(nombre_archivo:str):
     txtfile = open(nombre_archivo, "r")
     for x in txtfile:
-        if tokenizer._mwes == x:
-            print ("Yes")
-        else:
+        try:
+            exec(x)
+            print("Yes")
+        except:
             print("No")
 
+#-----------------------------------------------------------------------------
+def ejecutar():
+    nombre_archivo=input("Ingrese el nombre del archivo: ")
+    archivo(nombre_archivo)
 
-
-        
+ejecutar()
