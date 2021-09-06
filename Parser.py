@@ -204,6 +204,7 @@ def define(n, val):
 
 #------------------------Tokenizacion-Parser-------------------------------
 
+tokenizer=MWETokenizer()
 tokenizer.add_mwe(blockedp())
 def archivo(nombre_archivo:str):
     txtfile = open(nombre_archivo, "r")
