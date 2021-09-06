@@ -1,5 +1,7 @@
 import tokenize
 import random
+import nltk
+from nltk.tokenize import MWETokenizer
 matrix= []
 robot= {"name": "robot", "direction":"north","chips": 0, "balloons":0}
 matrixobj= []
@@ -178,6 +180,39 @@ def blockedp():
         return(True)
     except:
         return False
+
+def nop():
+    return None
+
+def block(function, *args, **kwargs):
+    function(*args, **kwargs)
+    return function
+    
+def repeat(n, function, *args, **kwargs):
+    n*function(*args, **kwargs)
+
+def conditional(expr:bool, function, *args, **kwargs):
+    return None
+
+def define(n, val):
+    try:
+        val=0
+        n=int(val)
+        return val
+    except:
+        return "Esto no es un numero entero, intente de nuevo."
+
+#------------------------Tokenizacion-Parser-------------------------------
+
+tokenizer.add_mwe(blockedp())
+def archivo(nombre_archivo:str):
+    txtfile = open(nombre_archivo, "r")
+    for x in txtfile:
+        if tokenizer._mwes == x:
+            print ("Yes")
+        else:
+            print("No")
+
 
 
         
