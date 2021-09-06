@@ -5,7 +5,7 @@ from nltk.tokenize import MWETokenizer
 matrix= []
 robot= {"name": "robot", "direction":"north","chips": 0, "balloons":0}
 matrixobj= []
-def Move(n):
+def Move(n:int):
     for i in range(len(matrix)):
         for j in range(len(matrix[i])):
             if matrix[i][j] != None and matrix[i][j]["name"]=="robot":
@@ -28,7 +28,7 @@ def Move(n):
         matrix[coordinate1] [newCordinate]= robot
         
 
-def Right(n):
+def Right(n:int):
     if robot["direction"] == "north":
         if n <= 90:
             robot["direction"] = "east"
@@ -67,7 +67,7 @@ def Right(n):
                 pass
     
 
-def Left(n):
+def Left(n:int):
    if robot["direction"] == "north":
         if n <= 90:
             robot["direction"] = "west"
@@ -113,7 +113,7 @@ def rotate(n):
     else:
         Right(n)
 
-def Look(o):
+def Look(o:str):
     if o == "N":
         robot["direction"] = "north"
     elif o == "E":
@@ -123,7 +123,7 @@ def Look(o):
     elif o == "S":
         robot["direction"]= "southt"
 
-def drop(n):
+def drop(n:int):
     chips= robot["chips"]
     robot["chips"]= chips - n
     for i in range(len(matrix)):
@@ -133,7 +133,7 @@ def drop(n):
                 coordinate2= j
     matrixobj[coordinate1][coordinate2]["chips"]+= n 
 
-def free(n):
+def free(n:int):
     balloons= robot["balloons"]
     robot["balloons"]= balloons - n
     for i in range(len(matrix)):
@@ -143,7 +143,7 @@ def free(n):
                 coordinate2= j
     matrixobj[coordinate1][coordinate2]["balloons"]+= n 
 
-def pick(n):
+def pick(n:int):
     chips= robot["chips"]
     robot["chips"]= chips + n
     for i in range(len(matrix)):
@@ -153,7 +153,7 @@ def pick(n):
                 coordinate2= j
     matrixobj[coordinate1][coordinate2]["chips"]-= n 
 
-def pop(n):
+def pop(n:int):
     balloons= robot["balloons"]
     robot["balloons"]= balloons + n
     for i in range(len(matrix)):
@@ -163,16 +163,16 @@ def pop(n):
                 coordinate2= j
     matrixobj[coordinate1][coordinate2]["balloons"]-= n
 
-def check(o,n):
+def check(o:str,n:int):
     for i in range(len(matrix)):
         for j in range(len(matrix[i])):
             if matrix[i][j] != None and matrix[i][j]["name"]=="robot":
                 coordinate1= i
                 coordinate2= j
     if o == "B":
-        return matrixobj[coordinate1][coordinate2]["balloons"]
+        return matrixobj[coordinate1][coordinate2]["balloons"]== n
     else:
-        return matrixobj[coordinate1][coordinate2]["chips"]
+        return matrixobj[coordinate1][coordinate2]["chips"]==n
 
 def blockedp():
     try:
