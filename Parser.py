@@ -2,18 +2,20 @@ import tokenize
 import random
 import nltk
 from nltk.tokenize import MWETokenizer
-matrix= []
 robot= {"name": "robot", "direction":"north","chips": 0, "balloons":0}
-matrixobj= []
-def Move(n:int):
+matrix= [[robot,0,0],
+        [0,0,0],
+        [0,0,0]]
+matrixobj= [[{},{"balloons" : 0, "chips" : 0}]]
+def move(n:int):
     for i in range(len(matrix)):
         for j in range(len(matrix[i])):
-            if matrix[i][j] != None and matrix[i][j]["name"]=="robot":
+            if matrix[i][j] != 0:
                 coordinate1= i
                 coordinate2= j
                 direction= matrix[i][j]["direction"]
     
-    matrix[coordinate1] [coordinate2]= None
+    matrix[coordinate1] [coordinate2]= 0
     if direction == "north":
         newCordinate= coordinate1 + n
         matrix[ newCordinate] [coordinate2]= robot
@@ -28,7 +30,7 @@ def Move(n:int):
         matrix[coordinate1] [newCordinate]= robot
         
 
-def Right(n:int):
+def right(n:int):
     if robot["direction"] == "north":
         if n <= 90:
             robot["direction"] = "east"
@@ -67,7 +69,7 @@ def Right(n:int):
                 pass
     
 
-def Left(n:int):
+def left(n:int):
    if robot["direction"] == "north":
         if n <= 90:
             robot["direction"] = "west"
@@ -109,11 +111,11 @@ def rotate(n):
     d= ("left","right")
     selected= random.choice(d)
     if selected == "left":
-        Left(n)
+        left(n)
     else:
-        Right(n)
+        right(n)
 
-def Look(o:str):
+def look(o:str):
     if o == "N":
         robot["direction"] = "north"
     elif o == "E":
@@ -166,17 +168,17 @@ def pop(n:int):
 def check(o:str,n:int):
     for i in range(len(matrix)):
         for j in range(len(matrix[i])):
-            if matrix[i][j] != None and matrix[i][j]["name"]=="robot":
+            if matrix[i][j] != 0:
                 coordinate1= i
                 coordinate2= j
-    if o == "B":
-        return matrixobj[coordinate1][coordinate2]["balloons"]== n
-    else:
+    if o == "b":
+        return matrixobj[coordinate1][coordinate2]["balloons"]==n
+    elif o == "c":
         return matrixobj[coordinate1][coordinate2]["chips"]==n
 
 def blockedp():
     try:
-        Move(1)
+        move(1)
         return(True)
     except:
         return False
@@ -208,15 +210,24 @@ tokenizer=MWETokenizer()
 def archivo(nombre_archivo:str):
     txtfile = open(nombre_archivo, "r")
     for x in txtfile:
-        try:
+            x=x.lower()
+            token=x.split()
+
+            if len(token)==1:
+                x=token[0]+"()"
+
+            elif len(token)==2:
+                x=token[0]+"("+token[1]+")"
+            
+            elif len(token)==3:
+                x=token[0]+"("+"'"+ token[1]+"'"+","+token[2]+")"
             exec(x)
-            print("Yes")
-        except:
-            print("No")
+            
+        
 
 #-----------------------------------------------------------------------------
 def ejecutar():
     nombre_archivo=input("Ingrese el nombre del archivo: ")
     archivo(nombre_archivo)
-
+    print(matrix)
 ejecutar()

@@ -1,1 +1,4 @@
-nop()
+Right 90
+Move 1
+Check C 0
+nop
