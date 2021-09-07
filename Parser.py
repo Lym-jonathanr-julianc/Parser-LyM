@@ -348,7 +348,7 @@ def block(blist):
         if ")" in i[-1]:
             i[-1].replace(")","")
         commands(i)
-            
+           
 
     
 
@@ -364,6 +364,7 @@ def archivo(nombre_archivo:str):
     rlist=[]
     iflist=[]
     nrepeat= 0
+    vardict= {}
     txtfile = open(nombre_archivo, "r")
     for x in txtfile:
             if isblock:
@@ -423,9 +424,12 @@ def archivo(nombre_archivo:str):
                 isIf = True
                 x.pop(0)
                 iflist.append(x)
-                
-
-            commands(token)
+                continue
+            
+            if token[0]== "define":
+                vardict[token[1]]= token[2]
+                continue
+           
             
 
        
@@ -441,72 +445,3 @@ ejecutar()
 
 
 
-
-def archivo(nombre_archivo:str):
-    isblock= False
-    isIf= True
-    txtfile = open(nombre_archivo, "r")
-    for x in txtfile:
-
-            if isblock:
-                
-                if token[0] == ")":
-                        continue
-                commands(token)
-                continue
-            if isIf:
-                if "]" in x:
-                    isIf= False
-                
-                if token[0] == "]":
-                        continue
-                x=x.lower()
-                x=x.replace("]","")
-                token=x.split()
-                commands(token)
-                continue
-            x=x.lower()
-            token=x.split()
-            if "if" == token[0]:
-                isIf= True
-                if token[1] == "!":
-                    if blockedp == False:
-                        if token[2] == "[":
-                            continue
-                        else:
-                            newtoken= token[2][1:]
-                            commands(newtoken)
-                            pass
-                    else:
-                        isIf= False
-                        continue
-                else:
-                    if blockedp:
-                        if token[2] == "[":
-                            continue
-                        else:
-                            newtoken= token[2][1:]
-                            commands(newtoken)
-                            pass
-                    else:
-                        isIf= False
-                        continue
-
-
-            if "(block" in token[0]:
-                if len(token)==1:
-                   isblock=True
-                   continue
-                else:
-                    if len(token)==2:
-                        x=token[1]+"()"
-
-                    elif len(token)==3:
-                        x=token[1]+"("+token[2]+")"
-                    
-                    elif len(token)==4:
-                        x=token[1]+"("+"'"+ token[2]+"'"+","+token[3]+")"
-                    exec(x)
-                    isblock=True
-                    continue
-            commands(token)
