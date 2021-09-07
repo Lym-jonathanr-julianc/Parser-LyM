@@ -439,8 +439,12 @@ def archivo(nombre_archivo:str):
 #-----------------------------------------------------------------------------
 def ejecutar():
     nombre_archivo=input("Ingrese el nombre del archivo: ")
-    archivo(nombre_archivo)
-    print(matrix)
+    try:
+        archivo(nombre_archivo)
+        print("Yes")
+    except:
+        print("No")
+    
 ejecutar()
 
 
