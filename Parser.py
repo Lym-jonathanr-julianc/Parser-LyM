@@ -350,7 +350,6 @@ def block(blist):
         commands(i)
            
 
-    
 
             
 
@@ -360,11 +359,14 @@ def archivo(nombre_archivo:str):
     isblock= False
     isIf= False
     isrepeat= False
+    istoend= False
     blist=[]
     rlist=[]
     iflist=[]
     nrepeat= 0
-    vardict= {}
+    vardict= []
+    varlist= []
+    name= None
     txtfile = open(nombre_archivo, "r")
     for x in txtfile:
             if isblock:
@@ -429,8 +431,7 @@ def archivo(nombre_archivo:str):
             if token[0]== "define":
                 vardict[token[1]]= token[2]
                 continue
-           
-            
+             
 
        
         
