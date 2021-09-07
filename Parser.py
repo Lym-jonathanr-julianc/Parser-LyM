@@ -211,23 +211,27 @@ def repeat(n, rlist):
         block(rlist)
         n=n-1
 def ifFunction(iflist):
+    
     isBlock=False
     isRepeat= False
     blist=[]
     rlist=[]
     nrepeat= 0
-    a= 0
+    istoend= False
+    itoelist=[]
+    name= None
     
     if iflist[0][0] == "!":
         iflist[0].pop(0)
-        iflist[0].pop(1)
+        iflist[0].pop(0)
         
         if blockedp == False:
             for i in iflist:
                 if isBlock:
                     if ")" in i:
                         isblock= False
-                    blist.append(i)
+                    if i[0] != ")":
+                        blist.append(i)
                     if isblock == False:
                         block(blist)
                         blist=[]
@@ -239,7 +243,29 @@ def ifFunction(iflist):
                     if isRepeat== False:
                         repeat(nrepeat,blist)
                         rlist=[]
-                    continue     
+                    continue
+                if istoend:
+                    if "end" in i:
+                        istoend= False
+                        toend(itoelist,varlist)
+                        itoelist= []
+                        varlist= []
+                        continue
+                    if "outpout" in i and len(i)==1:
+                        continue
+                
+                    if "outpout" in i:
+                            i.pop(0)
+                    itoelist.append(i)
+                    continue
+        
+                if "to" in i:
+                    name= i[1]
+                    istoend= True
+                    if len(i)>2:
+                        for j in range(2,len(i)+1):
+                            varlist.append(i[j])
+                    continue 
                 if len(i) == 1 and i[0]=="[":
                     continue
                 else:
@@ -252,7 +278,7 @@ def ifFunction(iflist):
                     if "repeat" in i:
                         isRepeat= True
                         i.pop(0)
-                        i.pop(1)
+                        i.pop(0)
                         nrepeat= i[0]
                         rlist.append(i)
                         continue
@@ -280,20 +306,42 @@ def ifFunction(iflist):
                     if isRepeat== False:
                         repeat(blist)
                         rlist=[]
-                    continue     
+                    continue
+                if istoend:
+                    if "end" in i:
+                        istoend= False
+                        toend(itoelist,varlist)
+                        itoelist= []
+                        varlist= []
+                        continue
+                    if "outpout" in i and len(i)==1:
+                        continue
+                
+                    if "outpout" in i:
+                            i.pop(0)
+                    itoelist.append(i)
+                    continue
+        
+                if "to" in i:
+                    name= i[1]
+                    istoend= True
+                    if len(i)>2:
+                        for j in range(2,len(i)+1):
+                            varlist.append(i[j])
+                    continue 
                 if len(i) == 1 and i[0]=="[":
                     continue
                 else:
                     if "block" in i:
                         isBlock= True
                         i.pop(0)
-                        i.pop(1)
+                        i.pop(0)
                         blist.append(i)
                         continue
                     if "repeat" in i:
                         isRepeat= True
                         i.pop(0)
-                        i.pop(1)
+                        i.pop(0)
                         nrepeat= i[0]
                         rlist.append(i)
                         continue
@@ -307,8 +355,13 @@ def block(blist):
     isrepeat= False
     iflist=[]
     rlist=[]
+    varlist=[]
     nrepeat= 0
+    istoend= False
+    itoelist=[]
+    name= None
     for i in blist:
+        
         if isIf:
             if "]" in i[-1]:
               isIf= False
@@ -339,42 +392,62 @@ def block(blist):
         if "repeat" in i:
             isrepeat= True
             i.pop(0)
-            i.pop(1)
+            i.pop(0)
             nrepeat=i[0]
             rlist.append(i)
             continue
+        if istoend:
+            if "end" in i:
+                    istoend= False
+                    toend(itoelist,varlist)
+                    itoelist= []
+                    varlist= []
+                    continue
+            if "outpout" in i and len(i)==1:
+                    continue
+                
+            if "outpout" in i:
+                    i.pop(0)
+            itoelist.append(i)
+            continue
 
+
+
+        
+        if "to" in i:
+            name= i[1]
+            istoend= True
+            if len(i)>2:
+                for j in range(2,len(i)+1):
+                    varlist.append(i[j])
+            continue
 
         if ")" in i[-1]:
             i[-1].replace(")","")
+        
         commands(i)
-           
-
-
-            
-
-#------------------------Tokenizacion-Parser-------------------------------
-
-def archivo(nombre_archivo:str):
-    isblock= False
-    isIf= False
-    isrepeat= False
-    istoend= False
-    blist=[]
-    rlist=[]
-    iflist=[]
-    nrepeat= 0
-    vardict= []
-    varlist= []
-    name= None
-    txtfile = open(nombre_archivo, "r")
-    for x in txtfile:
+        
+def toend(toelist,varlist,name):
+    def fun(*args,varlist):
+        isblock= False
+        isIf= False
+        isrepeat= False
+        istoend= False
+        blist=[]
+        rlist=[]
+        iflist=[]
+        nrepeat= 0
+        itoelist=[]
+        vardict= []
+        name= None
+        for x in varlist:
             if isblock:
                 if ")" in x:
                     isblock= False
                 x=x.lower()
                 token=x.split()
-                blist.append(token)
+                if token[0] != ")":
+                    blist.append(token)
                 if isblock == False:
                     block(blist)
                     blist=[]
@@ -402,22 +475,23 @@ def archivo(nombre_archivo:str):
 
             x=x.lower()
             token=x.split()
-            if "(block" in token:
+            if "block" in token:
                 isblock = True
-                if len(token) == 1:
+                if len(token) == 2:
                     continue
                 else:
                   token.pop(0)
-                  token.pop(1)
+                  token.pop(0)
                   blist.append(token)
                   continue
-            if "(repeat" in token:
+            if "repeat" in token:
                 isrepeat = True
-                if len(token) == 1:
+                if len(token) == 3:
+                    nrepeat= token[2]
                     continue
                 else:
                   token.pop(0)
-                  token.pop(1)
+                  token.pop(0)
                   nrepeat= token[0]
                   token.pop(0)
                   rlist.append(token)
@@ -431,7 +505,142 @@ def archivo(nombre_archivo:str):
             if token[0]== "define":
                 vardict[token[1]]= token[2]
                 continue
-             
+
+            if istoend:
+                if "end" in token:
+                    istoend= False
+                    toend(itoelist,varlist)
+                    itoelist= []
+                    varlist= []
+                    continue
+                if "outpout" in token and len(token)==1:
+                    continue
+                
+                if "outpout" in token:
+                    token.pop(0)
+                itoelist.append(token)
+                continue
+
+            if token[0]=="to":
+                name= token[1]
+                istoend= True
+                if len(token)>2:
+                 for i in range(2,len(token)+1):
+                     varlist.append(token[i])
+                continue 
+    name= fun
+
+
+
+            
+
+#------------------------Tokenizacion-Parser-------------------------------
+
+def archivo(nombre_archivo:str):
+    isblock= False
+    isIf= False
+    isrepeat= False
+    istoend= False
+    blist=[]
+    rlist=[]
+    iflist=[]
+    nrepeat= 0
+    itoelist=[]
+    vardict= []
+    varlist= []
+    name= None
+    txtfile = open(nombre_archivo, "r")
+    for x in txtfile:
+            if isblock:
+                if ")" in x:
+                    isblock= False
+                x=x.lower()
+                token=x.split()
+                if token[0] != ")":
+                    blist.append(token)
+                if isblock == False:
+                    block(blist)
+                    blist=[]
+                continue  
+            if isrepeat:
+                if ")" in x:
+                    isrepeat= False
+                x=x.lower()
+                token=x.split()
+                rlist.append(token)
+                if isrepeat == False:
+                    block(nrepeat ,rlist)
+                    rlist=[]
+                continue     
+            if isIf:
+                if "]" in x[-1]:
+                    isIf= False
+                if x[0] == "]":
+                    continue
+                x[-1]=x[-1].replace("]","")
+                iflist.append(x)
+                if isIf== False:
+                    ifFunction(iflist)
+                continue   
+
+            x=x.lower()
+            token=x.split()
+            if "block" in token:
+                isblock = True
+                if len(token) == 2:
+                    continue
+                else:
+                  token.pop(0)
+                  token.pop(0)
+                  blist.append(token)
+                  continue
+            if "repeat" in token:
+                isrepeat = True
+                if len(token) == 3:
+                    nrepeat= token[2]
+                    continue
+                else:
+                  token.pop(0)
+                  token.pop(0)
+                  nrepeat= token[0]
+                  token.pop(0)
+                  rlist.append(token)
+                  continue
+            if "if" in token:
+                isIf = True
+                x.pop(0)
+                iflist.append(x)
+                continue
+            
+            if token[0]== "define":
+                vardict[token[1]]= token[2]
+                continue
+
+            if istoend:
+                if "end" in token:
+                    istoend= False
+                    toend(itoelist,varlist,name)
+                    itoelist= []
+                    varlist= []
+                    name= None
+                    continue
+                if "outpout" in token and len(token)==1:
+                    continue
+                
+                if "outpout" in token:
+                    token.pop(0)
+                itoelist.append(token)
+                continue                   
+                
+            if token[0]=="to":
+                name= token[1]
+                istoend= True
+                if len(token)>2:
+                 for i in range(2,len(token)+1):
+                     varlist.append(token[i])
+                continue
+                     
+         
 
        
         
@@ -443,7 +652,7 @@ def ejecutar():
         archivo(nombre_archivo)
         print("Yes")
     except:
-        print("No")
+            print("No")
     
 ejecutar()
 
