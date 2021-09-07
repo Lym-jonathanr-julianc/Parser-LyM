@@ -1,7 +1,6 @@
-import tokenize
+
 import random
-import nltk
-from nltk.tokenize import MWETokenizer
+
 robot= {"name": "robot", "direction":"north","chips": 0, "balloons":0}
 matrix= [[robot,0,0],
         [0,0,0],
@@ -186,15 +185,6 @@ def blockedp():
 def nop():
     return None
 
-def block(function, *args, **kwargs):
-    function(*args, **kwargs)
-    return function
-    
-def repeat(n, function, *args, **kwargs):
-    n*function(*args, **kwargs)
-
-def conditional(expr:bool, function, *args, **kwargs):
-    return None
 
 def define(n, val):
     try:
@@ -204,25 +194,241 @@ def define(n, val):
     except:
         return "Esto no es un numero entero, intente de nuevo."
 
-#------------------------Tokenizacion-Parser-------------------------------
-
-tokenizer=MWETokenizer()
-def archivo(nombre_archivo:str):
-    txtfile = open(nombre_archivo, "r")
-    for x in txtfile:
-            x=x.lower()
-            token=x.split()
-
-            if len(token)==1:
+def commands(token:list):
+        if len(token)==1 and token != ")":
                 x=token[0]+"()"
 
-            elif len(token)==2:
-                x=token[0]+"("+token[1]+")"
+        elif len(token)==2:
+            x=token[0]+"("+token[1]+")"
+        
+        elif len(token)==3:
+            x=token[0]+"("+"'"+ token[1]+"'"+","+token[2]+")"
+        else:
+            pass
+        exec(x)
+def repeat(n, rlist):
+    while n>0:
+        block(rlist)
+        n=n-1
+def ifFunction(iflist):
+    isBlock=False
+    isRepeat= False
+    blist=[]
+    rlist=[]
+    nrepeat= 0
+    a= 0
+    
+    if iflist[0][0] == "!":
+        iflist[0].pop(0)
+        iflist[0].pop(1)
+        
+        if blockedp == False:
+            for i in iflist:
+                if isBlock:
+                    if ")" in i:
+                        isblock= False
+                    blist.append(i)
+                    if isblock == False:
+                        block(blist)
+                        blist=[]
+                    continue 
+                if isRepeat:
+                    if ")" in i:
+                        isRepeat= False
+                    rlist.append(i)
+                    if isRepeat== False:
+                        repeat(nrepeat,blist)
+                        rlist=[]
+                    continue     
+                if len(i) == 1 and i[0]=="[":
+                    continue
+                else:
+                    if "block" in i:
+                        isBlock= True
+                        i.pop(0)
+                        i.pop(1)
+                        blist.append(i)
+                        continue
+                    if "repeat" in i:
+                        isRepeat= True
+                        i.pop(0)
+                        i.pop(1)
+                        nrepeat= i[0]
+                        rlist.append(i)
+                        continue
+                    if i[0] == "[":
+                        i.pop(0)
+                    commands(i)
+        else:
+            pass
+    else:
+        iflist[0].pop(0)
+        if blockedp:
+            for i in iflist:
+                if isBlock:
+                    if ")" in i:
+                        isblock= False
+                    blist.append(i)
+                    if isblock == False:
+                        block(blist)
+                        blist=[]
+                    continue 
+                if isRepeat:
+                    if ")" in i:
+                        isRepeat= False
+                    rlist.append(i)
+                    if isRepeat== False:
+                        repeat(blist)
+                        rlist=[]
+                    continue     
+                if len(i) == 1 and i[0]=="[":
+                    continue
+                else:
+                    if "block" in i:
+                        isBlock= True
+                        i.pop(0)
+                        i.pop(1)
+                        blist.append(i)
+                        continue
+                    if "repeat" in i:
+                        isRepeat= True
+                        i.pop(0)
+                        i.pop(1)
+                        nrepeat= i[0]
+                        rlist.append(i)
+                        continue
+                    if i[0] == "[":
+                        i.pop(0)
+                    commands(i)
+        else:
+            pass
+def block(blist):
+    isIf= False
+    isrepeat= False
+    iflist=[]
+    rlist=[]
+    nrepeat= 0
+    for i in blist:
+        if isIf:
+            if "]" in i[-1]:
+              isIf= False
+            if i[0] == "]":
+                continue
+            i[-1]=i[-1].replace("]","")
+            iflist.append(i)
+            if isIf== False:
+                ifFunction(iflist)
+            continue
+        if isrepeat:
+            if ")" in i[-1]:
+              isIf= False
+            if i[0] == ")":
+                continue
+            i[-1]=i[-1].replace(")","")
+            rlist.append(i)
+            if isrepeat== False:
+                repeat(nrepeat, rlist)
+            continue
             
-            elif len(token)==3:
-                x=token[0]+"("+"'"+ token[1]+"'"+","+token[2]+")"
-            exec(x)
+        if i[0] == "if":
+            isIf= True
+            i.pop(0)
+            iflist.append(i)
+            continue
+
+        if "repeat" in i:
+            isrepeat= True
+            i.pop(0)
+            i.pop(1)
+            nrepeat=i[0]
+            rlist.append(i)
+            continue
+
+
+        if ")" in i[-1]:
+            i[-1].replace(")","")
+        commands(i)
             
+
+    
+
+            
+
+#------------------------Tokenizacion-Parser-------------------------------
+
+def archivo(nombre_archivo:str):
+    isblock= False
+    isIf= False
+    isrepeat= False
+    blist=[]
+    rlist=[]
+    iflist=[]
+    nrepeat= 0
+    txtfile = open(nombre_archivo, "r")
+    for x in txtfile:
+            if isblock:
+                if ")" in x:
+                    isblock= False
+                x=x.lower()
+                token=x.split()
+                blist.append(token)
+                if isblock == False:
+                    block(blist)
+                    blist=[]
+                continue  
+            if isrepeat:
+                if ")" in x:
+                    isrepeat= False
+                x=x.lower()
+                token=x.split()
+                rlist.append(token)
+                if isrepeat == False:
+                    block(nrepeat ,rlist)
+                    rlist=[]
+                continue     
+            if isIf:
+                if "]" in x[-1]:
+                    isIf= False
+                if x[0] == "]":
+                    continue
+                x[-1]=x[-1].replace("]","")
+                iflist.append(x)
+                if isIf== False:
+                    ifFunction(iflist)
+                continue   
+
+            x=x.lower()
+            token=x.split()
+            if "(block" in token:
+                isblock = True
+                if len(token) == 1:
+                    continue
+                else:
+                  token.pop(0)
+                  token.pop(1)
+                  blist.append(token)
+                  continue
+            if "(repeat" in token:
+                isrepeat = True
+                if len(token) == 1:
+                    continue
+                else:
+                  token.pop(0)
+                  token.pop(1)
+                  nrepeat= token[0]
+                  token.pop(0)
+                  rlist.append(token)
+                  continue
+            if "if" in token:
+                isIf = True
+                x.pop(0)
+                iflist.append(x)
+                
+
+            commands(token)
+            
+
+       
         
 
 #-----------------------------------------------------------------------------
@@ -231,3 +437,76 @@ def ejecutar():
     archivo(nombre_archivo)
     print(matrix)
 ejecutar()
+
+
+
+
+
+def archivo(nombre_archivo:str):
+    isblock= False
+    isIf= True
+    txtfile = open(nombre_archivo, "r")
+    for x in txtfile:
+
+            if isblock:
+                
+                if token[0] == ")":
+                        continue
+                commands(token)
+                continue
+            if isIf:
+                if "]" in x:
+                    isIf= False
+                
+                if token[0] == "]":
+                        continue
+                x=x.lower()
+                x=x.replace("]","")
+                token=x.split()
+                commands(token)
+                continue
+            x=x.lower()
+            token=x.split()
+            if "if" == token[0]:
+                isIf= True
+                if token[1] == "!":
+                    if blockedp == False:
+                        if token[2] == "[":
+                            continue
+                        else:
+                            newtoken= token[2][1:]
+                            commands(newtoken)
+                            pass
+                    else:
+                        isIf= False
+                        continue
+                else:
+                    if blockedp:
+                        if token[2] == "[":
+                            continue
+                        else:
+                            newtoken= token[2][1:]
+                            commands(newtoken)
+                            pass
+                    else:
+                        isIf= False
+                        continue
+
+
+            if "(block" in token[0]:
+                if len(token)==1:
+                   isblock=True
+                   continue
+                else:
+                    if len(token)==2:
+                        x=token[1]+"()"
+
+                    elif len(token)==3:
+                        x=token[1]+"("+token[2]+")"
+                    
+                    elif len(token)==4:
+                        x=token[1]+"("+"'"+ token[2]+"'"+","+token[3]+")"
+                    exec(x)
+                    isblock=True
+                    continue
+            commands(token)

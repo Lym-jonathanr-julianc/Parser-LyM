@@ -1,4 +1,9 @@
 Right 90
 Move 1
 Check C 0
+(BLOCK
+LEFT 90
+MOVE 1
+NOP
+)
 nop
